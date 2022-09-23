@@ -13,16 +13,18 @@ NORMAL_COLOR='\033[37m'
 ERROR_COLOR='\033[0;31m'
 INFO_COLOR='\033[0;33m'
 SUCCE_COLOR='\033[0;32m'
-BACKUPTIME=`date +"%H_%M_%S-%m_%d_%Y"`
+#BACKUPTIME=`date +"%H_%M_%S-%m_%d_%Y"`
+BACKUPTIME=`date +"%m_%d_%Y"`
+
 
 ShowError() {
-   echo -e "[ ${ERROR_COLOR}Error${NORMAL_COLOR} ] \t - $(date +%T) - $1"
+   echo -e "[ ${ERROR_COLOR}Error${NORMAL_COLOR} ] \t - $(date +%T) - $1\n"
    echo -e "[ Error ] - $(date +%T) - $1" >> $LOG_FILE
 }
 ShowSuccessful(){
 
-    echo -e "[ ${SUCCE_COLOR}Ok${NORMAL_COLOR} ] \t\t - $(date +%T) - $1"
-    echo -e "[ Ok ] - $(date +%T) - $1" >> $LOG_FILE
+   echo -e "[ ${SUCCE_COLOR}Ok${NORMAL_COLOR} ] \t\t - $(date +%T) - $1"
+   echo -e "[ Ok ] - $(date +%T) - $1" >> $LOG_FILE
 }
 ShowInfo() {
    echo -e "[ ${INFO_COLOR}Info${NORMAL_COLOR} ] \t - $(date +%T) - $1"
@@ -39,7 +41,7 @@ if [ ! -f "$1" ]; then
 
 CheckFolder() {
 if [ ! -d "$1" ]; then
-    sudo mkdir  "$1"
+    sudo mkdir -p "$1"
     ShowSuccessful "File $1 created."
  fi
 }
@@ -48,7 +50,7 @@ if [ ! -d "$1" ]; then
 # Detect Debian users running the script with "sh" instead of bash
 if readlink /proc/$$/exe | grep -q "dash"; then
 	ShowError 'This installer needs to be run with "bash", not "sh".'
-	exit
+	exit 1
 fi
 
 # Check the script is not being run by root
@@ -57,15 +59,54 @@ if [ "$(id -u)" != "0" ]; then
    exit 1
 fi
 
+
+BackupVM(){
+
+	PATH_VM=$BACKUP_DIR/$BACKUPTIME/$1
+        # add vm disk names to array
+	IMAGES=$(virsh domblklist "$1" --details | grep vda | awk '{print $4}')
+
+	ShowInfo "Start backup: $1"
+ 	CheckFolder "$PATH_VM"
+### Backup VM config
+ 	CheckFolder "$PATH_VM/config"
+	CheckFile "$PATH_VM/config/dumpxml.xml"
+	ShowInfo "Start backup config: ../$1/config/dumpxml.xml"
+        sudo virsh dumpxml $1 > $PATH_VM/config/dumpxml.xml
+	ShowSuccessful "End backup config: $1 "
+### Backup snapshot 
+	CheckFolder "$PATH_VM/snapshot"
+	virsh snapshot-current $1 > /dev/null 2>&1
+	if [ $? -eq 0 ]
+		then
+		#It has snapshot
+		echo "It has snapshot"
+	else
+		ShowInfo "$1 has not snapshot "
+	fi
+### Backup images
+	CheckFolder "$PATH_VM/images"
+
+
+
+
+
+
+
+
+	ShowSuccessful "End backup: $1 "
+}
+
 CheckFile $LOG_FILE
 ShowInfo "Start backup of host: $(hostname)"
 CheckFolder $BACKUP_DIR
 CheckFolder $BACKUP_DIR/$BACKUPTIME
 
-for $VM in $VM_LIST
-  do 
-    ShowInfo $VM
-  done
+#for VM in $VM_LIST
+ # do 
+     BackupVM prdfs01
+#$VM
+  #done
 
 
 
