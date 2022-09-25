@@ -5,7 +5,7 @@ BACKUP_DIR=/mnt/backupvmm
 # target vm list (running)
 VM_LIST=`virsh list | grep running | awk '{print $2}'`
 LOG_FILE=/var/log/autobackup.log
-
+MAX_BACKUP=1
 
 ### Other Variable
 
@@ -15,10 +15,10 @@ INFO_COLOR='\033[0;33m'
 SUCCE_COLOR='\033[0;32m'
 #BACKUPTIME=`date +"%H_%M_%S-%m_%d_%Y"`
 BACKUPTIME=`date +"%m_%d_%Y"`
-
+LOG_LOCAL=false
 
 ShowError() {
-   echo -e "[ ${ERROR_COLOR}Error${NORMAL_COLOR} ] \t - $(date +%T) - $1\n"
+   echo -e "[ ${ERROR_COLOR}Error${NORMAL_COLOR} ] \t - $(date +%T) - $1"
    echo -e "[ Error ] - $(date +%T) - $1" >> $LOG_FILE
 }
 ShowSuccessful(){
@@ -66,14 +66,23 @@ BackupVM(){
         # add vm disk names to array
 	IMAGES=$(virsh domblklist "$1" --details | grep vda | awk '{print $4}')
 
-	ShowInfo "Start backup: $1"
  	CheckFolder "$PATH_VM"
+        ShowInfo "Start backup: $1"
+
 ### Backup VM config
  	CheckFolder "$PATH_VM/config"
 	CheckFile "$PATH_VM/config/dumpxml.xml"
 	ShowInfo "Start backup config: ../$1/config/dumpxml.xml"
-        sudo virsh dumpxml $1 > $PATH_VM/config/dumpxml.xml
-	ShowSuccessful "End backup config: $1 "
+
+         sudo virsh dumpxml $1 > $PATH_VM/config/dumpxml.xml 2>&1
+	 if [ $? -eq 0 ]
+                then
+		ShowSuccessful "Backup for virsh dumpxml $1 created"
+        else
+                ShowError "We were unable to create a backup for virsh dumpxml $1"
+        fi
+
+	ShowSuccessful "End backup config: $1"
 ### Backup snapshot 
 	CheckFolder "$PATH_VM/snapshot"
 	virsh snapshot-current $1 > /dev/null 2>&1
@@ -86,15 +95,15 @@ BackupVM(){
 	fi
 ### Backup images
 	CheckFolder "$PATH_VM/images"
-
-
-
-
-
-
-
-
-	ShowSuccessful "End backup: $1 "
+	ShowInfo "Start backup images $1" 
+	sudo cp $IMAGES $PATH_VM/images 2>&1
+	if [ $? -eq 0 ]
+                then
+                ShowSuccessful "End backup images $1"
+        else
+                ShowError "Error backup images $1"
+        fi
+	ShowSuccessful "End backup: $1"
 }
 
 CheckFile $LOG_FILE
