@@ -16,9 +16,11 @@ BACKUPTIME=`date +"%m_%d_%Y"`
 LOG_LOCAL=false
 
 ### Notification
+# Telegram
 TG_ENABLED=true
 TG_BOT_TOKEN=2006604850:AAFg496KSncZm4R0_TCYTvs9XW3NBPrAAXw
 TG_CHAT_ID=-1001860620931
+TG_MESSAGE="The backup was created on the host $(hostname)."
 TG_ATTACH_LOG=true
 
 
@@ -135,7 +137,6 @@ BackupVM(){
 
 NotifyOnTG(){
 ShowInfo "Sending log to: $TG_CHAT_ID"
-TG_MESSAGE="The backup was created on the host $(hostname)."
 curl "https://api.telegram.org/bot$TG_BOT_TOKEN/sendMessage?chat_id=$TG_CHAT_ID&text=$(echo $TG_MESSAGE | sed 's/ /%20/g')" > /dev/null 2>&1
 if [ "$TG_ATTACH_LOG" = "true" ]; then
 
@@ -173,8 +174,6 @@ done
 DeleteOldBackupVM
 
 ShowInfo "=============Notification============="
-
 if [ "$TG_ENABLED" = "true" ]; then
-
-NotifyOnTG
+	NotifyOnTG
 fi
