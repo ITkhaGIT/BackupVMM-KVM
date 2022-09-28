@@ -4,8 +4,7 @@
 BACKUP_DIR=/mnt/backupvmm
 LOG_FILE=/var/log/autobackup.log
 MAX_BACKUP=1
-VM_EXCEPTION=(prdfs01)
-
+VM_EXCEPTION=()
 ### Other Variable
 
 NORMAL_COLOR='\033[37m'
@@ -15,12 +14,12 @@ SUCCE_COLOR='\033[0;32m'
 BACKUPTIME=`date +"%m_%d_%Y"`
 LOG_LOCAL=false
 
-### Notification
-TG_ENABLED=true
-TG_BOT_TOKEN=2006604850:AAFg496KSncZm4R0_TCYTvs9XW3NBPrAAXw
-TG_CHAT_ID=-1001860620931
-TG_ATTACH_LOG=true
+### Notificatio
 
+# Telegram
+TG_ENALED=false 
+TG_TOKEN_BOT=2006604850:AAFg496KSncZm4R0_TCYTvs9XW3NBPrAAXw
+TG_CHAT_ID=-780220122
 
 ### Don't Change
 # target vm list (running)
@@ -109,15 +108,15 @@ BackupVM(){
 
 	ShowSuccessful "End backup config: $1"
 ### Backup snapshot 
-	CheckFolder "$PATH_VM/snapshot"
-	virsh snapshot-current $1 > /dev/null 2>&1
-	if [ $? -eq 0 ]
-		then
-		#It has snapshot
-		echo "It has snapshot"
-	else
-		ShowInfo "$1 has not snapshot "
-	fi
+#	CheckFolder "$PATH_VM/snapshot"
+#	virsh snapshot-current $1 > /dev/null 2>&1
+#	if [ $? -eq 0 ]
+#		then
+#		#It has snapshot
+#		echo "It has snapshot"
+#	else
+#		ShowInfo "$1 has not snapshot "
+#	fi
 ### Backup images
 	CheckFolder "$PATH_VM/images"
 	ShowInfo "Start backup images $1" 
@@ -132,19 +131,6 @@ BackupVM(){
         fi
 	ShowSuccessful "End backup: $1"
 }
-
-NotifyOnTG(){
-ShowInfo "Sending log to: $TG_CHAT_ID"
-TG_MESSAGE=`echo "The backup was created on the host $(hostname)." | sed 's/ /%20/g'`
-curl "https://api.telegram.org/bot$TG_BOT_TOKEN/sendMessage?chat_id=$TG_CHAT_ID&text=$(echo $TG_MESSAGE | sed 's/ /%20/g')" 
-if [ "$TG_ATTACH_LOG" = "true" ]; then
-
-ShowInfo "Attach log file: $LOG_FILE"
-curl "https://api.telegram.org/bot$TG_BOT_TOKEN/sendDocument?chat_id=$TG_CHAT_ID" -F document=@$LOG_FILE
-fi
-
-}
-
 
 CheckFile $LOG_FILE
 sudo cp /dev/null $LOG_FILE
@@ -171,10 +157,3 @@ IS_BACKUP=0
 	fi
 done
 DeleteOldBackupVM
-
-ShowInfo "=============Notification============="
-
-if [ "$TG_ENABLED" = "true" ]; then
-
-NotifyOnTG
-fi
