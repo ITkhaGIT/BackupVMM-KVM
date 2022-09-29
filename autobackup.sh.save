@@ -94,7 +94,7 @@ BackupVMConfig(){
         CheckFolder "$PATH_VM"
 	### Backup VM config
         CheckFolder "$PATH_VM/config"
-	CheckFile "$PATH_VM/config/dumpxml.xml"
+        CheckFile "$PATH_VM/config/dumpxml.xml"
         ShowInfo "Start backup config: ../$1/config/dumpxml.xml"
 
          sudo virsh dumpxml $1 > $PATH_VM/config/dumpxml.xml 2>&1
@@ -113,7 +113,7 @@ BackupVMImage(){
         CheckFolder "$PATH_VM/images"
 #######
         # add vm disk names to array
-	IMAGES=$(virsh domblklist "$1" --details | grep vda | awk '{print $4}')
+#	IMAGES=$(virsh domblklist "$1" --details | grep vda | awk '{print $4}')
 	sudo cp $IMAGES $PATH_VM/images >/dev/null 2>&1
 #######
         if [ $? -eq 0 ]
@@ -134,14 +134,13 @@ BackupVM(){
 }
 
 NotifyOnTG(){
-ShowInfo "Sending log to: $TG_CHAT_ID"
-MESSAGE=$(echo $TG_MESSAGE | sed 's/ /%20/g' | sed "s/%%ERROR%%/$ERROR/g" )
-curl "https://api.telegram.org/bot$TG_BOT_TOKEN/sendMessage?chat_id=$TG_CHAT_ID&text=$MESSAGE" > /dev/null 2>&1
-if [ "$TG_ATTACH_LOG" = "true" ]; then
-
-ShowInfo "Attach log file: $LOG_FILE"
-curl "https://api.telegram.org/bot$TG_BOT_TOKEN/sendDocument?chat_id=$TG_CHAT_ID" -F document=@$LOG_FILE > /dev/null 2>&1
-fi
+	ShowInfo "Sending log to: $TG_CHAT_ID"
+	MESSAGE=$(echo $TG_MESSAGE | sed 's/ /%20/g' | sed "s/%%ERROR%%/$ERROR/g" )
+	curl "https://api.telegram.org/bot$TG_BOT_TOKEN/sendMessage?chat_id=$TG_CHAT_ID&text=$MESSAGE" > /dev/null 2>&1
+	if [ "$TG_ATTACH_LOG" = "true" ]; then
+		ShowInfo "Attach log file: $LOG_FILE"
+		curl "https://api.telegram.org/bot$TG_BOT_TOKEN/sendDocument?chat_id=$TG_CHAT_ID" -F document=@$LOG_FILE > /dev/null 2>&1
+	fi
 
 }
 
