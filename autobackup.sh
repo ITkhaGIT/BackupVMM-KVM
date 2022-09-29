@@ -4,8 +4,7 @@
 BACKUP_DIR=/mnt/backup1
 LOG_FILE=/var/log/autobackup.log
 MAX_BACKUP=1
-#VM_EXCEPTION=(prdmta01 prdvpn01 prdfs01 prdzbx01 tstkvm0)
-VM_EXCEPTION=( prdmta01 prdvpn01 prddc01 prdzbx01 tstkvm0)
+VM_EXCEPTION=()
 
 ### Other Variable
 
