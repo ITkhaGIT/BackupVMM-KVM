@@ -4,6 +4,7 @@
 BACKUP_DIR=/mnt/backup1
 LOG_FILE=/var/log/autobackup.log
 MAX_BACKUP=1
+#VM_EXCEPTION=(domain1 domain2 domain3 domainN)
 VM_EXCEPTION=()
 
 ### Other Variable
@@ -27,8 +28,8 @@ TG_ATTACH_LOG=true
 ### Don't Change
 # target vm list (running)
 VM_LIST=`virsh list | grep running | awk '{print $2}'`
-PATH_VM
-
+PATH_VM=null
+IMAGES=null
 ShowError() {
    echo -e "[ ${ERROR_COLOR}Error${NORMAL_COLOR} ] \t - $(date +%T) - $1"
    echo -e "[ Error ] - $(date +%T) - $1" >> $LOG_FILE
@@ -111,15 +112,32 @@ BackupVMImage(){
         ShowInfo "Start backup images $1"
         CheckFolder "$PATH_VM/images"
 #######
+	ShowInfo "Copying image $1..."
         # add vm disk names to array
-	IMAGES=$(virsh domblklist "$1" --details | grep vda | awk '{print $4}')
+	IMAGES=$(virsh domblklist "$1" --details | grep file | awk '{print $4}')
 	sudo cp $IMAGES $PATH_VM/images >/dev/null 2>&1
 #######
         if [ $? -eq 0 ]
                 then
                 ShowSuccessful "End backup images $1"
         else
-                ShowError "Error backup images $1"
+		ShowInfo "VM $1 is being shutdown"
+		sudo virsh destroy $1 >/dev/null 2>&1
+		ShowInfo "Waiting for shutdown $1"
+echo "$IMAGES - $PATH_VM/images"
+		sleep 10
+			sudo cp $IMAGES $PATH_VM/images >/dev/null 2>&1
+			#######
+		        if [ $? -eq 0 ]
+                		then
+		                ShowSuccessful "End backup images $1"
+				sudo virsh start $1  >/dev/null 2>&1
+				ShowInfo "VM $1 started"
+
+        		else
+				ShowError "Error backup images $1"
+			fi
+
         fi
         ShowSuccessful "End backup: $1"
 }
