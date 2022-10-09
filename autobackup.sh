@@ -165,6 +165,7 @@ fi
 
 CheckFile $LOG_FILE
 sudo cp /dev/null $LOG_FILE
+ShowInfo "Made by Nikitin Roman <Roman.Nikitin@itkha.com>"
 ShowInfo "Start backup of host: $(hostname)"
 CheckFolder $BACKUP_DIR
 CheckFolder $BACKUP_DIR/$BACKUPTIME
