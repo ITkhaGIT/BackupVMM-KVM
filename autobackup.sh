@@ -13,7 +13,7 @@ NORMAL_COLOR='\033[37m'
 ERROR_COLOR='\033[0;31m'
 INFO_COLOR='\033[0;33m'
 SUCCE_COLOR='\033[0;32m'
-BACKUPTIME=`date +"%m_%d_%Y"`
+BACKUPTIME=`date +"%d_%m_%Y"`
 LOG_LOCAL=false
 ERROR=0
 ### Notification
