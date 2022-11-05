@@ -162,9 +162,12 @@ fi
 
 }
 
-
+Main()
+{
 CheckFile $LOG_FILE
 sudo cp /dev/null $LOG_FILE
+startTime=$(date +%s)
+
 ShowInfo "Made by Nikitin Roman <Roman.Nikitin@itkha.com>"
 ShowInfo "Start backup of host: $(hostname)"
 CheckFolder $BACKUP_DIR
@@ -173,22 +176,28 @@ ERROR=0
 for VM in $VM_LIST
 do
 IS_BACKUP=0
-	for VM_EXEPT in ${VM_EXCEPTION[@]}
-	do
-		if [ "$VM" = "$VM_EXEPT" ]; then
-		IS_BACKUP=1
-		fi
-	done
+        for VM_EXEPT in ${VM_EXCEPTION[@]}
+        do
+                if [ "$VM" = "$VM_EXEPT" ]; then
+                IS_BACKUP=1
+                fi
+        done
 
-	if [ "$IS_BACKUP" = 0 ]; then
-	BackupVM $VM
-	else
-	ShowInfo "Skipped. $VM add to list Exeption"
-	fi
+        if [ "$IS_BACKUP" = 0 ]; then
+        BackupVM $VM
+        else
+        ShowInfo "Skipped. $VM add to list Exeption"
+        fi
 done
+ShowInfo "Backup duration: $(($(date +%s) - $startTime))sec."
 DeleteOldBackupVM
 
 ShowInfo "=============Notification============="
 if [ "$TG_ENABLED" = "true" ]; then
-	NotifyOnTG
+        NotifyOnTG
 fi
+
+}
+
+
+Main
