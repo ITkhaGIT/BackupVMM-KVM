@@ -19,8 +19,8 @@ ERROR=0
 ### Notification
 # Telegram
 TG_ENABLED=true
-TG_BOT_TOKEN=2006604850:AAFg496KSncZm4R0_TCYTvs9XW3NBPrAAXw
-TG_CHAT_ID=-1001860620931
+TG_BOT_TOKEN=
+TG_CHAT_ID=
 TG_MESSAGE="The backup was created on the host $(hostname). Error: %%ERROR%%"
 TG_ATTACH_LOG=true
 
