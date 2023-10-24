@@ -1,5 +1,5 @@
 #!/bin/bash
-LOG_FILE=/var/log/autobackup.log
+source "/etc/ITkha/config.cfg"
 
 # Функция для отображения сообщения заданного цвета
 print_colored_message() {
@@ -10,13 +10,21 @@ print_colored_message() {
     case "$type" in
         "ERROR")
             echo -e "[ \e[31m$type\e[0m ] \t - $(date +%T) - $message"  # Красный цвет
+
             ;;
         "OK")
             echo -e "[  \e[32m$type\e[0m  ] \t - $(date +%T) - $message"  # Зеленый цвет
+
             ;;
         "INFO")
-            echo -e "[ \e[33m$type\e[0m ] \t - $(date +%T) - $message"  # Синий цвет
+            echo -e "[ \e[33m$type\e[0m ] \t - $(date +%T) - $message"  # Желтый цвет
+
             ;;
+        "HEADER")
+            echo -e "-----{ $message }-----"
+
+            ;;
+
         *)
             echo "$message"  # По умолчанию без изменения цвета
             ;;
@@ -41,16 +49,18 @@ while [[ $# -gt 0 ]]; do
   case $notification_type in
     -e|--error)
       print_colored_message "ERROR" "$notification_text"
-	echo "$2"
       shift 2
       ;;
     -s|--success)
       print_colored_message "OK" "$notification_text"
-      echo "$2"
       shift 2
       ;;
     -i|--info)
       print_colored_message "INFO" "$notification_text"
+      shift 2
+      ;;
+    -h|--header)
+      print_colored_message "HEADER" "$notification_text"
       shift 2
       ;;
     *)
