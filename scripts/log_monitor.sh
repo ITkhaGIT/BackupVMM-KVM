@@ -9,15 +9,15 @@ print_colored_message() {
 
     case "$type" in
         "ERROR")
-            echo -e "[ \e[31m$type\e[0m ] \t - $(date +%T) - $message"  # Красный цвет
+            echo -e "[ \e[31m\u2717\e[0m ] \t - $(date +%T) - $message"  # Красный цвет
 
             ;;
         "OK")
-            echo -e "[  \e[32m$type\e[0m  ] \t - $(date +%T) - $message"  # Зеленый цвет
+            echo -e "[  \e[32m\u2713\e[0m  ] \t - $(date +%T) - $message"  # Зеленый цвет
 
             ;;
         "INFO")
-            echo -e "[ \e[33m$type\e[0m ] \t - $(date +%T) - $message"  # Желтый цвет
+            echo -e "[ \e[34mi\e[0m ] \t - $(date +%T) - $message"  # Желтый цвет
 
             ;;
         "HEADER")
@@ -33,6 +33,8 @@ print_colored_message() {
 save_in_file  "$type" "$notification_text"
 
 }
+
+
 save_in_file() {
     local type=$1
     local message=$2
