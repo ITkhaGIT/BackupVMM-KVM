@@ -28,8 +28,7 @@ case "$TARGET_VMs" in
     VMs=$(virsh list --all --name)
     ;;
 esac
-
- for VM in "${VMs[@]}"; do
+ for VM in $VMs; do
         IS_BACKUP=0
         for VM_EXEPT in ${VM_EXCEPTION[@]}
         do
@@ -39,9 +38,6 @@ esac
         done
 
         if [ "$IS_BACKUP" = 0 ]; then
-
-       
-bash $PATHAPP/scripts/log_monitor.sh -i "Start Copy $VM"
 
 
         else
