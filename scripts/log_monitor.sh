@@ -1,52 +1,51 @@
 #!/bin/bash
-source "/etc/ITkha/config.cfg"
+# Set the path for the application
+PATHAPP="/etc/ITkha"
 
-# Функция для отображения сообщения заданного цвета
+# Source the configuration file
+source "$PATHAPP/config.cfg"
+
+# Function to print a colored message based on the message type
 print_colored_message() {
     local type=$1
     local message=$2
 
-
     case "$type" in
         "ERROR")
-            echo -e "[ \e[31m\u2717\e[0m ] \t - $(date +%T) - $message"  # Красный цвет
-
+            echo -e "[ \e[31m\u2717\e[0m ] \t - $(date +%T) - $message"  # Red color
             ;;
         "OK")
-            echo -e "[  \e[32m\u2713\e[0m  ] \t - $(date +%T) - $message"  # Зеленый цвет
-
+            echo -e "[ \e[32m\u2713\e[0m ] \t - $(date +%T) - $message"  # Green color
             ;;
         "INFO")
-            echo -e "[ \e[34mi\e[0m ] \t - $(date +%T) - $message"  # Желтый цвет
-
+            echo -e "[ \e[34mi\e[0m ] \t - $(date +%T) - $message"  # Blue color
             ;;
         "HEADER")
             echo -e "-----{ $message }-----"
-
             ;;
-
         *)
-            echo "$message"  # По умолчанию без изменения цвета
+            echo "$message"  # Default without color change
             ;;
     esac
 
-save_in_file  "$type" "$notification_text"
-
+    # Save the notification in the log file
+    save_in_file "$type" "$notification_text"
 }
 
-
+# Function to save the notification in the log file
 save_in_file() {
     local type=$1
     local message=$2
 
-    # Сохраняем уведомление в файл
+    # Save the notification in the log file
     echo -e "[ $type ] \t - $(date +%T) - $message" >> "$LOG_FILE"
-
 }
-# Принимаем аргументы: тип уведомления и текст уведомления
+
+# Accept command line arguments: notification type and notification text
 notification_type=$1
 notification_text=$2
 
+# Process command line arguments
 while [[ $# -gt 0 ]]; do
   case $notification_type in
     -e|--error)
@@ -70,4 +69,3 @@ while [[ $# -gt 0 ]]; do
       ;;
   esac
 done
-
