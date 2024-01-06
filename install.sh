@@ -1,6 +1,6 @@
 #!/bin/bash
 # Set the installation path for the application
-PATHAPP=/etc/ITkha
+PATHAPP=/etc/ITkha/BackupVMM-KVM
 
 # Check if the script is run as root
 if [ "$(id -u)" != "0" ]; then
