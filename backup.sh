@@ -1,6 +1,7 @@
 #!/bin/bash
 # Set the path for the application configuration
-PATHAPP=/etc/ITkha
+PATHAPP=/etc/ITkha/BackupVMM-KVM
+
 # Source the configuration file
 source $PATHAPP/config.cfg
 
