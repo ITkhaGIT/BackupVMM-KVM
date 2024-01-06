@@ -1,9 +1,9 @@
 #!/bin/bash
 # Set the path for the application
-PATHAPP=/etc/ITkha
+PATHAPP=/etc/ITkha/BackupVMM-KVM
 
 # Source the configuration file
-source "$PATHAPP/config.cfg"
+source $PATHAPP/config.cfg
 
 # Log header for the removal of old backups
 bash $PATHAPP/scripts/log_monitor.sh -h "Remove old backups"
