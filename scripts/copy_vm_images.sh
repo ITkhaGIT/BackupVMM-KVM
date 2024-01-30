@@ -52,9 +52,14 @@ bash $PATHAPP/scripts/log_monitor.sh -s "Virtual machine $VM_NAME is offline"
 
 # Get the names of virtual machine disks and copy them to the destination path
 IMAGES=$(virsh domblklist "$VM_NAME" --details | grep file | awk '{print $4}')
-bash $PATHAPP/scripts/log_monitor.sh -i "Copying image virtual machine $VM_NAME"
-bash $PATHAPP/scripts/log_monitor.sh -i "Please wait..."
-sudo cp "$IMAGES" "$DEST_PATH/$VM_NAME.qcow2" >/dev/null 2>&1
+
+# Разделить список файлов на отдельные имена
+readarray -t IMAGE_ARRAY <<< "$IMAGES"
+
+# Перебрать каждый файл и скопировать его
+for IMAGE_FILE in "${IMAGE_ARRAY[@]}"; do
+    sudo cp "$IMAGE_FILE" "$DEST_PATH/$VM_NAME.qcow2" >/dev/null 2>&1
+done
 
 # Start the virtual machine if it was running before the copy process
 if [ "$VM_STATUS" = "running" ]; then
